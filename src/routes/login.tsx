@@ -73,7 +73,11 @@ export default function CreateAccount() {
           type="password"
           required
         />
-        <Input type="submit" value={isLoading ? "Loading..." : "Log in"} />
+        <Input
+          type="submit"
+          value={isLoading ? "Loading..." : "Log in"}
+          // style={{ cursor: "pointer" }}
+        />
       </Form>
       {error !== "" ? <Error>{error}</Error> : null}
       <Switcher>

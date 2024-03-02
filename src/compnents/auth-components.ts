@@ -20,7 +20,7 @@ export const Form = styled.form`
   flex-direction: column;
   gap: 10px;
   width: 100%;
-  &[type="submit"] {
+  [type="submit"] {
     cursor: pointer;
     &:hover {
       opacity: 0.8;

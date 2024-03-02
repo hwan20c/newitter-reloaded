@@ -28,6 +28,14 @@ interface FadeWrapperProps {
 
 const FadeWrapper = styled.div<FadeWrapperProps>`
   animation: ${({ $visible }) => ($visible ? fadeIn : fadeOut)} 1s ease-in-out;
+  input[type="submit"] {
+    cursor: pointer;
+
+    &:hover {
+      opacity: 0.8;
+      // 추가로 hover 시에 적용하고 싶은 스타일을 여기에 추가합니다.
+    }
+  }
 `;
 
 interface FindPasswordProps {
@@ -42,13 +50,27 @@ export default function FindPassword({
   setIsFPInputVisible,
 }: FindPasswordProps) {
   const [email, setEmail] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
-  const handleEmailBlur = () => {
-    setIsFPInputVisible(false);
-  };
+  const handleSendEmail = async () => {
+    if (!email) {
+      setError("Please enter your email address");
+      return;
+    }
 
-  const handleSendEmail = () => {
-    sendPasswordResetEmail(auth, email);
+    // 여기서 이메일 보내기 로직 추가
+    await sendPasswordResetEmail(auth, email)
+      .then(() => {
+        setError(null);
+        alert(
+          "Password reset email sent successfully \nIf the e-mail has not been sent, it may not be the registered e-mail address."
+        );
+        setIsFPInputVisible(false); // 성공했을 때만 숨김
+      })
+      .catch((error) => {
+        setError(error.message);
+        setIsFPInputVisible(true); // 실패했을 때는 숨기지 않음
+      });
   };
 
   return (
@@ -58,16 +80,18 @@ export default function FindPassword({
           <Input
             type="text"
             placeholder="Your Email"
-            onBlur={handleEmailBlur}
             onChange={(e) => setEmail(e.target.value)}
             style={{ marginTop: "10px" }}
           />
           <Input
             type="submit"
             value={isLoading ? "Loading..." : "Send Email"}
-            onClick={handleSendEmail}
+            onClick={() => {
+              handleSendEmail();
+            }}
             style={{ marginTop: "10px" }}
           />
+          {error && <p style={{ color: "red" }}>{error}</p>}
         </div>
       )}
     </FadeWrapper>
