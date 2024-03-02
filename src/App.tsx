@@ -1,5 +1,5 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import Layout from "./compnets/layout";
+import Layout from "./compnents/layout";
 import Home from "./routes/home";
 import Profile from "./routes/profile";
 import Login from "./routes/login";
@@ -7,9 +7,9 @@ import CreateAccount from "./routes/create-account";
 import styled, { createGlobalStyle } from "styled-components";
 import reset from "styled-reset";
 import { useEffect, useState } from "react";
-import LoadingScreen from "./compnets/loading-screen";
+import LoadingScreen from "./compnents/loading-screen";
 import { auth } from "./firebase";
-import ProtectedRoute from "./compnets/protected-route";
+import ProtectedRoute from "./compnents/protected-route";
 
 const router = createBrowserRouter([
   {

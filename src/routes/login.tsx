@@ -10,8 +10,8 @@ import {
   Switcher,
   Title,
   Wrapper,
-} from "../compnets/auth-components";
-import GithubButton from "../compnets/github-btn";
+} from "../compnents/auth-components";
+import GithubButton from "../compnents/github-btn";
 
 export default function CreateAccount() {
   const navigate = useNavigate();
@@ -72,10 +72,11 @@ export default function CreateAccount() {
       {error !== "" ? <Error>{error}</Error> : null}
       <Switcher>
         Don't have an account?{" "}
-        <Link to="/create-account">Create one &rarr;</Link>
+        <Link to="/create-account">Create One &rarr;</Link>
       </Switcher>
       <Switcher>
-        forgot a password? <Link to="/create-account">Create one &rarr;</Link>
+        forgot a password?{" "}
+        <Link to="/create-account">Find Password &rarr;</Link>
       </Switcher>
       <GithubButton />
     </Wrapper>
