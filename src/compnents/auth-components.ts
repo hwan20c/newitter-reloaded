@@ -46,4 +46,9 @@ export const Switcher = styled.span`
   a {
     color: #1d9bf0;
   }
+  span#findPasswordLink {
+    color: #1d9bf0; /* 링크 색상 */
+    text-decoration: underline; /* 밑줄 스타일 */
+    cursor: pointer; /* 커서를 포인터로 변경하여 클릭 가능하게 함 */
+  }
 `;

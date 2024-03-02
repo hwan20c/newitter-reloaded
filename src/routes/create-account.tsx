@@ -12,6 +12,7 @@ import {
   Wrapper,
 } from "../compnents/auth-components";
 import GithubButton from "../compnents/github-btn";
+import FindPassword from "../compnents/find-password";
 
 export default function CreateAccount() {
   const navigate = useNavigate();
@@ -20,6 +21,11 @@ export default function CreateAccount() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isFPInputVisible, setIsFPInputVisible] = useState(false);
+
+  const fPButtonClick = () => {
+    setIsFPInputVisible(!isFPInputVisible);
+  };
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {
@@ -94,8 +100,16 @@ export default function CreateAccount() {
       <Switcher>
         Already have an account? <Link to="/login">Log In &rarr;</Link>
       </Switcher>
-      <Switcher>
-        forgot a password? <Link to="/login">Find Password &rarr;</Link>
+      <Switcher style={{ textAlign: "center" }}>
+        forgot a password?{" "}
+        <span id="findPasswordLink" onClick={fPButtonClick}>
+          Find Password &rarr;
+        </span>
+        <FindPassword
+          isLoading={isLoading}
+          isFPInputVisible={isFPInputVisible}
+          setIsFPInputVisible={setIsFPInputVisible}
+        ></FindPassword>
       </Switcher>
       <GithubButton />
     </Wrapper>
