@@ -71,12 +71,12 @@ export default function PostTweetForm() {
 
     if (files && files.length === 1) {
       const selectedFile = files[0];
-      const fileSizeLimit = 1 * 1024 * 1024; // 1MB
+      const fileSizeLimit = 1 * 1024 * 1024 * 10; // 10MB
 
       if (selectedFile.size <= fileSizeLimit) {
         setFile(selectedFile);
       } else {
-        alert("파일 크기는 1MB 이하여야 합니다.");
+        alert("파일 크기는 10MB 이하여야 합니다.");
       }
     }
   };
