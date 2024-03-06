@@ -34,11 +34,7 @@ export default function Tweet({ username, photo, tweet }: ITweet) {
         <Username>{username}</Username>
         <Payload>{tweet}</Payload>
       </Cloumn>
-      {photo ? (
-        <Cloumn>
-          <Photo src={photo} />
-        </Cloumn>
-      ) : null}
+      <Cloumn>{photo ? <Photo src={photo} /> : null}</Cloumn>
     </Wrapper>
   );
 }
