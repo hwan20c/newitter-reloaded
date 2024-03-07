@@ -1,19 +1,17 @@
+import { collection, doc, updateDoc } from "firebase/firestore";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { useState } from "react";
 import styled from "styled-components";
 import { auth, db, storage } from "../firebase";
-import { addDoc, collection, updateDoc } from "firebase/firestore";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 interface IEditTweet {
   id: string;
   photo?: string;
   tweet: string;
-  userId: string;
-  updateAt: number;
 }
 
 interface EditTweetFormProps {
-  onCancel: React.MouseEventHandler<HTMLButtonElement>;
+  onCancel: () => void;
   tweetInfo: IEditTweet;
 }
 
@@ -98,16 +96,32 @@ const EditTweetForm: React.FC<EditTweetFormProps> = ({
   tweetInfo,
 }) => {
   const [isEditLoading, setEditLoading] = useState(false);
-  const [editTweet, setEditTweet] = useState("");
+  const [editTweet, setEditTweet] = useState(tweetInfo.tweet);
   const [editFile, setEditFile] = useState<File | null>(null);
 
   const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setEditTweet(e.target.value);
   };
 
+  const onEditFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { files } = e.target;
+
+    if (files && files.length === 1) {
+      const selectedFile = files[0];
+      const fileSizeLimit = 1 * 1024 * 1024 * 10; // 10MB
+
+      if (selectedFile.size <= fileSizeLimit) {
+        setEditFile(selectedFile);
+      } else {
+        alert("파일 크기는 10MB 이하여야 합니다.");
+      }
+    }
+  };
+
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const user = auth.currentUser;
+
     if (
       !user ||
       isEditLoading ||
@@ -118,22 +132,27 @@ const EditTweetForm: React.FC<EditTweetFormProps> = ({
 
     try {
       setEditLoading(true);
-      const doc = await addDoc(collection(db, "tweets"), {
+      const docRef = doc(collection(db, "tweets"), tweetInfo.id);
+
+      await updateDoc(docRef, {
         tweet: editTweet,
-        createdAt: Date.now(),
-        username: user.displayName || "Anonymous",
-        userId: user.uid,
+        updateAt: Date.now(),
       });
+
       if (editFile) {
-        const locationRef = ref(storage, `tweets/${user.uid}/${doc.id}`);
+        const locationRef = ref(storage, `tweets/${user.uid}/${tweetInfo.id}`);
         const result = await uploadBytes(locationRef, editFile);
         const url = await getDownloadURL(result.ref);
-        await updateDoc(doc, {
+
+        await updateDoc(docRef, {
           photo: url,
         });
       }
+
       setEditTweet("");
       setEditFile(null);
+
+      onCancel();
     } catch (e) {
       console.log(e);
     } finally {
@@ -154,9 +173,16 @@ const EditTweetForm: React.FC<EditTweetFormProps> = ({
         <AttachFileButton htmlFor="file">
           {editFile ? "Photo added ✅" : "Change photo"}
         </AttachFileButton>
-        <AttachFileInput type="file" id="file" accept="image/*" />
+        <AttachFileInput
+          onChange={onEditFileChange}
+          type="file"
+          id="file"
+          accept="image/*"
+        />
         <BtnArea>
-          <CancleBtn onClick={onCancel}>Cancel</CancleBtn>
+          <CancleBtn type="button" onClick={onCancel}>
+            Cancel
+          </CancleBtn>
           <SubmitBtn
             type="submit"
             value={isEditLoading ? "Posting..." : "Edit Tweet"}

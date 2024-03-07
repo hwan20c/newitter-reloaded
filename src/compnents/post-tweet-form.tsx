@@ -118,13 +118,13 @@ export default function PostTweetForm() {
         value={tweet}
         placeholder="What is happening?!"
       />
-      <AttachFileButton htmlFor="file">
+      <AttachFileButton htmlFor="editFile">
         {file ? "Photo added ✅" : "Add photo"}
       </AttachFileButton>
       <AttachFileInput
         onChange={onFileChange}
         type="file"
-        id="file"
+        id="editFile"
         accept="image/*"
       />
       <SubmitBtn

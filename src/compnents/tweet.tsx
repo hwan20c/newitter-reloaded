@@ -87,7 +87,7 @@ export default function Tweet({ username, photo, tweet, userId, id }: ITweet) {
   };
 
   const onDelete = async () => {
-    const ok = confirm("Ara you suer you want to delete this tweet?");
+    const ok = confirm("Ara you sure you want to delete this tweet?");
 
     if (!ok || user?.uid !== userId) return;
 
@@ -126,7 +126,7 @@ export default function Tweet({ username, photo, tweet, userId, id }: ITweet) {
       {isEditing && (
         <EditTweetForm
           onCancel={onCancelButtonClick}
-          tweetInfo={{ id, photo, tweet, userId, updateAt: Date.now() }}
+          tweetInfo={{ id, photo, tweet }}
         />
       )}
     </Wrapper>
