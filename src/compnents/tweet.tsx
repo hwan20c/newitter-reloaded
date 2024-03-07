@@ -3,6 +3,8 @@ import { ITweet } from "./timeline";
 import { auth, db, storage } from "../firebase";
 import { deleteDoc, doc } from "firebase/firestore";
 import { deleteObject, ref } from "firebase/storage";
+import { useState } from "react";
+import EditTweetForm from "./edit-tweet-form";
 
 const Wrapper = styled.div`
   display: grid;
@@ -12,9 +14,18 @@ const Wrapper = styled.div`
   border-radius: 15px;
 `;
 
-const Cloumn = styled.div`
+const Column = styled.div`
+  display: flex;
+  flex-direction: column;
+
   &:last-child {
     place-self: end;
+  }
+
+  button {
+    &:not(:first-of-type) {
+      margin-left: 10px; // 필요에 따라 마진 값을 조절하세요
+    }
   }
 `;
 
@@ -34,6 +45,10 @@ const Payload = styled.p`
   font-size: 18px;
 `;
 
+const ButtonDiv = styled.div`
+  margin-top: auto;
+`;
+
 const DeleteButton = styled.button`
   background-color: tomato;
   color: white;
@@ -46,8 +61,31 @@ const DeleteButton = styled.button`
   cursor: pointer;
 `;
 
+const EditButton = styled.button`
+  background-color: white;
+  color: black;
+  font-weight: 600;
+  border: 0;
+  font-size: 12px;
+  padding: 5px 10px;
+  text-transform: uppercase;
+  border-radius: 5px;
+  cursor: pointer;
+`;
+
 export default function Tweet({ username, photo, tweet, userId, id }: ITweet) {
   const user = auth.currentUser;
+
+  const [isEditing, setEditing] = useState(false);
+
+  const onEditButtonClick = () => {
+    setEditing(true);
+  };
+
+  const onCancelButtonClick = () => {
+    setEditing(false);
+  };
+
   const onDelete = async () => {
     const ok = confirm("Ara you suer you want to delete this tweet?");
 
@@ -65,16 +103,32 @@ export default function Tweet({ username, photo, tweet, userId, id }: ITweet) {
       //
     }
   };
+
   return (
     <Wrapper>
-      <Cloumn>
-        <Username>{username}</Username>
-        <Payload>{tweet}</Payload>
-        {user?.uid === userId ? (
-          <DeleteButton onClick={onDelete}>Delete</DeleteButton>
-        ) : null}
-      </Cloumn>
-      <Cloumn>{photo ? <Photo src={photo} /> : null}</Cloumn>
+      {!isEditing && (
+        <Column>
+          <Username>{username}</Username>
+          <Payload>{tweet}</Payload>
+          <ButtonDiv>
+            {user?.uid === userId ? (
+              <DeleteButton onClick={onDelete}>Delete</DeleteButton>
+            ) : null}
+            {user?.uid === userId ? (
+              <EditButton onClick={onEditButtonClick}>Edit</EditButton>
+            ) : null}
+          </ButtonDiv>
+        </Column>
+      )}
+
+      {!isEditing && <Column>{photo ? <Photo src={photo} /> : null}</Column>}
+
+      {isEditing && (
+        <EditTweetForm
+          onCancel={onCancelButtonClick}
+          tweetInfo={{ id, photo, tweet, userId, updateAt: Date.now() }}
+        />
+      )}
     </Wrapper>
   );
 }
