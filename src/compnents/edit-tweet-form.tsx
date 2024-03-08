@@ -136,7 +136,7 @@ const EditTweetForm: React.FC<EditTweetFormProps> = ({
 
       await updateDoc(docRef, {
         tweet: editTweet,
-        updateAt: Date.now(),
+        updatedAt: Date.now(),
       });
 
       if (editFile) {
