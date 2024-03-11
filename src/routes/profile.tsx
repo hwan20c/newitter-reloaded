@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { auth, db, storage } from "../firebase";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { updateProfile } from "firebase/auth";
 import {
@@ -43,40 +43,36 @@ const AvatarInput = styled.input`
 `;
 const Name = styled.span`
   font-size: 22px;
-  border-bottom: 1px dashed transparent;
-  cursor: pointer;
-  user-select: none;
-
-  &:hover {
-    border-bottom-color: #333;
-  }
 `;
 const EditName = styled.input`
   font-size: 22px;
+  color: white;
   border: none;
-  outline: none;
+  background-color: black;
+  width: 170px;
 `;
 
 const CommonButtonStyles = `
   color: white;
   background-color: transparent;
-  width: 35px;
-  height: 35px;
   border: none;
   border-radius: 20px;
   cursor: pointer;
 `;
-
-export const EditButton = styled.button`
+const EditButton = styled.button`
   ${CommonButtonStyles}
+  width: 35px;
+  height: 35px;
 `;
-
-export const ConfirmButton = styled.button`
-  ${CommonButtonStyles}/* 추가적인 스타일 */
+const ConfirmButton = styled.button`
+  ${CommonButtonStyles}
+  width: 35px;
+  height: 35px;
 `;
-
-export const CancelButton = styled.button`
-  ${CommonButtonStyles}/* 추가적인 스타일 */
+const CancelButton = styled.button`
+  ${CommonButtonStyles}
+  width: 35px;
+  height: 35px;
 `;
 const Tweets = styled.div`
   display: flex;
@@ -91,11 +87,23 @@ export default function Profile() {
   const [tweets, setTweets] = useState<ITweet[]>([]);
   const [isEditingName, setEditingName] = useState(false);
   const [userName, setUserName] = useState("");
+  const editedNameInputRef = useRef<HTMLInputElement>(null);
 
   const onNameEdit = () => {
     setEditingName(true);
     setUserName(user?.displayName ?? "Anonymous");
   };
+
+  useEffect(() => {
+    if (isEditingName && editedNameInputRef.current) {
+      const lastCharIndex = editedNameInputRef.current.value.length;
+      editedNameInputRef.current.setSelectionRange(
+        lastCharIndex,
+        lastCharIndex
+      );
+      editedNameInputRef.current.focus();
+    }
+  }, [isEditingName]);
 
   const onCancelEdit = () => {
     setEditingName(false);
@@ -113,7 +121,6 @@ export default function Profile() {
           await updateProfile(user, {
             displayName: editedName,
           });
-
           setUserName(editedName);
         }
 
@@ -125,10 +132,6 @@ export default function Profile() {
       }
     }
   };
-
-  // const onUserNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   setUserName(e.target.value);
-  // };
 
   const onAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
@@ -198,7 +201,8 @@ export default function Profile() {
               type="text"
               defaultValue={userName}
               id="editNameInput"
-              // onChange={onUserNameChange}
+              ref={editedNameInputRef}
+              maxLength={30}
             ></EditName>
             <ConfirmButton onClick={onEditButtonClick}>
               <svg
