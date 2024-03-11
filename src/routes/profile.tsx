@@ -110,24 +110,22 @@ export default function Profile() {
   };
 
   const onEditButtonClick = async () => {
-    const editedNameInput = document.getElementById(
-      "editNameInput"
-    ) as HTMLInputElement;
-    const editedName = editedNameInput.value;
+    if (editedNameInputRef.current) {
+      const editedName = editedNameInputRef.current.value;
 
-    if (editedName !== null || editedName !== "") {
-      try {
-        if (user) {
-          await updateProfile(user, {
-            displayName: editedName,
-          });
-          setUserName(editedName);
-        }
-
-        setEditingName(false);
-      } catch (e) {
-        if (e instanceof FirebaseError) {
-          console.error("Error updating display name:", e.message);
+      if (editedName !== null || editedName !== "") {
+        try {
+          if (user) {
+            await updateProfile(user, {
+              displayName: editedName,
+            });
+            setUserName(editedName);
+          }
+          setEditingName(false);
+        } catch (e) {
+          if (e instanceof FirebaseError) {
+            console.error("Error updating display name:", e.message);
+          }
         }
       }
     }
@@ -200,7 +198,6 @@ export default function Profile() {
             <EditName
               type="text"
               defaultValue={userName}
-              id="editNameInput"
               ref={editedNameInputRef}
               maxLength={30}
             ></EditName>
