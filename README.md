@@ -29,3 +29,7 @@ export default {
 - Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
 - Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
 # newitter-reloaded
+
+
+https://nwitter-reroaded.web.app/login
+(r 오타... 수정하려면 다시 만들어야 되서 아직 두는중..)
