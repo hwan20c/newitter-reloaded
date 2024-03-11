@@ -13,6 +13,7 @@ import {
 } from "firebase/firestore";
 import { ITweet } from "../compnents/timeline";
 import Tweet from "../compnents/tweet";
+import { FirebaseError } from "firebase/app";
 
 const Wrapper = styled.div`
   display: flex;
@@ -42,6 +43,40 @@ const AvatarInput = styled.input`
 `;
 const Name = styled.span`
   font-size: 22px;
+  border-bottom: 1px dashed transparent;
+  cursor: pointer;
+  user-select: none;
+
+  &:hover {
+    border-bottom-color: #333;
+  }
+`;
+const EditName = styled.input`
+  font-size: 22px;
+  border: none;
+  outline: none;
+`;
+
+const CommonButtonStyles = `
+  color: white;
+  background-color: transparent;
+  width: 35px;
+  height: 35px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+`;
+
+export const EditButton = styled.button`
+  ${CommonButtonStyles}
+`;
+
+export const ConfirmButton = styled.button`
+  ${CommonButtonStyles}/* 추가적인 스타일 */
+`;
+
+export const CancelButton = styled.button`
+  ${CommonButtonStyles}/* 추가적인 스타일 */
 `;
 const Tweets = styled.div`
   display: flex;
@@ -54,6 +89,46 @@ export default function Profile() {
   const user = auth.currentUser;
   const [avatar, setAvatar] = useState(user?.photoURL);
   const [tweets, setTweets] = useState<ITweet[]>([]);
+  const [isEditingName, setEditingName] = useState(false);
+  const [userName, setUserName] = useState("");
+
+  const onNameEdit = () => {
+    setEditingName(true);
+    setUserName(user?.displayName ?? "Anonymous");
+  };
+
+  const onCancelEdit = () => {
+    setEditingName(false);
+  };
+
+  const onEditButtonClick = async () => {
+    const editedNameInput = document.getElementById(
+      "editNameInput"
+    ) as HTMLInputElement;
+    const editedName = editedNameInput.value;
+
+    if (editedName !== null || editedName !== "") {
+      try {
+        if (user) {
+          await updateProfile(user, {
+            displayName: editedName,
+          });
+
+          setUserName(editedName);
+        }
+
+        setEditingName(false);
+      } catch (e) {
+        if (e instanceof FirebaseError) {
+          console.error("Error updating display name:", e.message);
+        }
+      }
+    }
+  };
+
+  // const onUserNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   setUserName(e.target.value);
+  // };
 
   const onAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
@@ -69,7 +144,6 @@ export default function Profile() {
       });
     }
   };
-
   const fetchTweets = async () => {
     const twwetQuery = query(
       collection(db, "tweets"),
@@ -94,6 +168,7 @@ export default function Profile() {
   useEffect(() => {
     fetchTweets();
   }, []);
+
   return (
     <Wrapper>
       <AvatarUpload htmlFor="avatar">
@@ -116,7 +191,64 @@ export default function Profile() {
         type="file"
         accept="image/*"
       />
-      <Name>{user?.displayName ?? "Anonymous"}</Name>
+      <div>
+        {isEditingName ? (
+          <>
+            <EditName
+              type="text"
+              defaultValue={userName}
+              id="editNameInput"
+              // onChange={onUserNameChange}
+            ></EditName>
+            <ConfirmButton onClick={onEditButtonClick}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                />
+              </svg>
+            </ConfirmButton>
+            <CancelButton onClick={onCancelEdit}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18 18 6M6 6l12 12"
+                />
+              </svg>
+            </CancelButton>
+          </>
+        ) : (
+          <>
+            <Name>{user?.displayName ?? "Anonymous"} </Name>
+            <EditButton onClick={onNameEdit}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="w-6 h-6"
+              >
+                <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32L19.513 8.2Z" />
+              </svg>
+            </EditButton>
+          </>
+        )}
+      </div>
       <Tweets>
         {tweets.map((tweet) => (
           <Tweet key={tweet.id} {...tweet} />
