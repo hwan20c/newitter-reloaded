@@ -26,3 +26,7 @@ dist-ssr
 # etc
 github_login_with_firebase
 
+# firebase
+.firebaserc
+firebase.json
+.firebase
